@@ -39,11 +39,23 @@ class MainActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this, MyViewModelFactory(RepositoryTermin(retrofitService,this )))
             .get(ViewModelTermin::class.java)
-
-
-        //inputText()
-
+        initViewModel()
     }
+
+    fun initViewModel(){
+        viewModel.mutableLiveData.observe(this, Observer {
+            Log.d("test", "OnCreate " + it.get(0).def.get(0).sseq.get(0).get(0).get(1).toString())
+
+            desc=it.get(0).def.get(0).sseq.get(0).get(0).get(1).toString()
+
+            binding.textView.text = desc
+
+        })
+        viewModel.errorMessage.observe(this, Observer {
+            //Log.d("test" ,"error " + it)
+        })
+    }
+
 
     fun inputText():String{
         desc2 = binding.input.text.toString()
@@ -53,19 +65,6 @@ class MainActivity : AppCompatActivity() {
 
     fun learnButton(view: View) {
         inputText()
-
-        viewModel.mutableLiveData.observe(this, Observer {
-            Log.d("test", "OnCreate " + it.get(0).def.get(0).sseq.get(0).get(0).get(1).toString())
-
-            desc=it.get(0).def.get(0).sseq.get(0).get(0).get(1).toString()
-
-            binding.textView.text = desc
-
-        })
-
-        viewModel.errorMessage.observe(this, Observer {
-            //Log.d("test" ,"error " + it)
-        })
 
         viewModel.getAllTermin()
     }

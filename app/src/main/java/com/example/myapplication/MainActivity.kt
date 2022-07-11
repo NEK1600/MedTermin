@@ -1,16 +1,19 @@
 package com.example.myapplication
 
+import android.app.ProgressDialog.show
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.data.model.ResponceN
 import com.example.myapplication.data.remote.ApiServise
 import com.example.myapplication.databinding.ActivityMainBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import com.example.myapplication.viewModel.MyViewModelFactory
+import com.example.myapplication.viewModel.RepositoryTermin
+import com.example.myapplication.viewModel.ViewModelTermin
+import kotlinx.coroutines.*
 import okhttp3.Dispatcher
 import retrofit2.Call
 import retrofit2.Callback
@@ -18,8 +21,14 @@ import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private var desc=""
+     var desc=""
+     var desc2=""
     private var list1 = mutableListOf<String>()
+    lateinit var viewModel: ViewModelTermin
+    private val retrofitService = ApiServise.create()
+
+    //private val repositoryTermin = RepositoryTermin(retrofitService)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,46 +37,40 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
-        CoroutineScope(Dispatchers.IO).launch {
-            initConect()
-        }
-
-        binding.textView.text = desc
-}
+        viewModel = ViewModelProvider(this, MyViewModelFactory(RepositoryTermin(retrofitService,this )))
+            .get(ViewModelTermin::class.java)
 
 
-    fun initConect(){
-            val apiInterface = ApiServise.create().getTermin(binding.input.text.toString(),
-                "7688f877-5af1-4c1d-9cab-4f36b65646e1")
-
-            apiInterface.enqueue( object : Callback<ResponceN> {
-                override fun onResponse(call: Call<ResponceN>?, response: Response<ResponceN>?) {
-
-                    desc=response?.body()?.get(0)?.def?.get(0)?.sseq?.get(0)?.get(0)?.get(1).toString()
-
-/*
-                    val strs = desc.split("").toTypedArray()
-                    for (i in strs){
-                        list1.add(i)
-                    }
-                    Log.d("test", "OnResponse " + list1)*/
-
-                }
-
-                override fun onFailure(call: Call<ResponceN>?, t: Throwable?) {
-                    Log.d("test", "OnFailure " + t?.message)
-                }
-            })
+        //inputText()
 
     }
+
+    fun inputText():String{
+        desc2 = binding.input.text.toString()
+        return desc2
+    }
+
 
     fun learnButton(view: View) {
-        CoroutineScope(Dispatchers.IO).launch {
-            initConect()
-        }
+        inputText()
 
-        binding.textView.text = desc
+        viewModel.mutableLiveData.observe(this, Observer {
+            Log.d("test", "OnCreate " + it.get(0).def.get(0).sseq.get(0).get(0).get(1).toString())
+
+            desc=it.get(0).def.get(0).sseq.get(0).get(0).get(1).toString()
+
+            binding.textView.text = desc
+
+        })
+
+        viewModel.errorMessage.observe(this, Observer {
+            //Log.d("test" ,"error " + it)
+        })
+
+        viewModel.getAllTermin()
     }
+
+
 }
 
 

@@ -17,15 +17,10 @@ class ViewModelTermin constructor(private val repository: RepositoryTermin): Vie
      val mutableLiveData = MutableLiveData<ResponceN>()
     val errorMessage = MutableLiveData<String>()
 
-    val loading = MutableLiveData<Boolean>()
-    var job: Job? = null
-    val exceptionHandler = CoroutineExceptionHandler {_, throwable ->
-        onError("Exception handled: ${throwable.localizedMessage}")
-    }
+    //var job: Job? = null
 
-    fun getAllTermin2() {
-        job = CoroutineScope(Dispatchers.IO + exceptionHandler).launch{
-            loading.postValue(true)
+   /*fun getAllTermin2() {
+        job = CoroutineScope(Dispatchers.IO ).launch{
             val responce = repository.getAllTermin()
             withContext(Dispatchers.Main) {
                 mutableLiveData.postValue(responce.body())
@@ -33,28 +28,12 @@ class ViewModelTermin constructor(private val repository: RepositoryTermin): Vie
             }
         }
 
+    }*/
+    fun getAllTermin2()= viewModelScope.launch(Dispatchers.IO) {
+       val responce = repository.getAllTermin()
+       mutableLiveData.postValue(responce.body())
+       Log.d("test", "coroutines" + responce.body().toString())
+   }
 
-    }
-
-    private fun onError(message: String) {
-        errorMessage.value = message
-        loading.value = false
-    }
-    override fun onCleared() {
-        super.onCleared()
-        job?.cancel()
-    }
 
 }
-/*responce.enqueue(object : Callback<ResponceN>{
-            override fun onResponse(call: Call<ResponceN>?, response: Response<ResponceN>?) {
-                mutableLiveData.postValue(response?.body())
-                //Log.d("test", "OnResponse  " + response?.body())
-                Log.d("test", "Input  " + responce2)
-            }
-
-            override fun onFailure(call: Call<ResponceN>?, t: Throwable?) {
-                Log.d("test", "OnFailure " + t?.message)
-                errorMessage.postValue(t?.message)
-            }
-        })*/

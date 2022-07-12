@@ -13,6 +13,8 @@ class RepositoryTermin constructor(private val retrofitService: ApiServise,
 private val mainActivity: MainActivity) {
 
 
-    fun getAllTermin() = retrofitService.getTermin(mainActivity.inputText(),
+    suspend fun getAllTermin() = retrofitService.getTermin(mainActivity.inputText(),
         "7688f877-5af1-4c1d-9cab-4f36b65646e1")
+
+
 }

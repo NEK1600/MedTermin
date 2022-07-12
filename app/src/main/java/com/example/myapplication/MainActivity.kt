@@ -21,13 +21,12 @@ import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-     var desc=""
-     var desc2=""
+    var desc=""
+    var desc2=""
     private var list1 = mutableListOf<String>()
     lateinit var viewModel: ViewModelTermin
     private val retrofitService = ApiServise.create()
 
-    //private val repositoryTermin = RepositoryTermin(retrofitService)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,14 +38,17 @@ class MainActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this, MyViewModelFactory(RepositoryTermin(retrofitService,this )))
             .get(ViewModelTermin::class.java)
+
         initViewModel()
+
     }
 
     fun initViewModel(){
         viewModel.mutableLiveData.observe(this, Observer {
-            Log.d("test", "OnCreate " + it.get(0).def.get(0).sseq.get(0).get(0).get(1).toString())
+            //Log.d("test", "OnCreate " + it.get(0).def.get(0).sseq.get(0).get(0).get(1).toString())
 
             desc=it.get(0).def.get(0).sseq.get(0).get(0).get(1).toString()
+
 
             binding.textView.text = desc
 
@@ -54,6 +56,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.errorMessage.observe(this, Observer {
             //Log.d("test" ,"error " + it)
         })
+
     }
 
 
@@ -66,7 +69,7 @@ class MainActivity : AppCompatActivity() {
     fun learnButton(view: View) {
         inputText()
 
-        viewModel.getAllTermin()
+        viewModel.getAllTermin2()
     }
 
 

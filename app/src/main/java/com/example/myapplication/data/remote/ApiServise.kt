@@ -2,6 +2,7 @@ package com.example.myapplication.data.remote
 import com.example.myapplication.data.model.ResponceN
 import com.example.myapplication.data.model.ResponceNItem
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -11,10 +12,10 @@ import retrofit2.http.Query
 interface ApiServise {
 
     @GET("api/v3/references/medical/json/{test}?key=")
-    fun getTermin(
+    suspend fun getTermin(
         @Path("test") test:String,
         @Query("key") key:String
-    ) : Call<ResponceN>
+    ) : Response <ResponceN>    //ResponceN //List<ResponceN>
 
 //https://dictionaryapi.com/api/v3/references/medical/json/test?key=7688f877-5af1-4c1d-9cab-4f36b65646e1
 
